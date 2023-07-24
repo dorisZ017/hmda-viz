@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="sbt: org.jboss.xnio:xnio-nio:3.8.7.Final:jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/jboss/xnio/xnio-nio/3.8.7.Final/xnio-nio-3.8.7.Final.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/jboss/xnio/xnio-nio/3.8.7.Final/xnio-nio-3.8.7.Final-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/jboss/xnio/xnio-nio/3.8.7.Final/xnio-nio-3.8.7.Final-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

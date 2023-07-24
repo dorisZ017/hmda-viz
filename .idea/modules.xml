@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hmda-backend.iml" filepath="$PROJECT_DIR$/.idea/modules/hmda-backend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hmda-spark.iml" filepath="$PROJECT_DIR$/.idea/modules/hmda-spark.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hmda-viz.iml" filepath="$PROJECT_DIR$/.idea/modules/hmda-viz.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hmda-viz-build.iml" filepath="$PROJECT_DIR$/.idea/modules/hmda-viz-build.iml" />
+    </modules>
+  </component>
+</project>
