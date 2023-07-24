@@ -1,1 +1,6 @@
 /spark-warehouse/
+/spark_driver/target/
+/target/
+/backend/target/
+/.idea/
+/.bsp/
