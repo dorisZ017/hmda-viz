@@ -1,34 +1,24 @@
 import { assert } from "console"
 
-export interface Query {
+export interface VizProps {
+    xKeys: string[],
+    yKeys: string[]
+}
+
+export interface Agg {
     select: string,
     where: string,
     groupby: string,
-
 }
 
-export interface Filter {
-    attribute: string,
-    operator: Operator,
-    value: string
+export interface AggViz {
+    agg: Agg,
+    vizProps: VizProps,
 }
 
-export enum Operator {
-    ">",
-    ">=",
-    "<",
-    "<=",
-    "!=",
-    "=",
-    "IN",
-    "NOT IN"
+export interface Sample {
+    select: string,
+    where: string,
+    limit: string,
 }
 
-export enum Stats {
-    "avg",
-    "median",
-    "min",
-    "max",
-    "std",
-    none = ""
-}

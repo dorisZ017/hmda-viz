@@ -2,105 +2,86 @@ import React, { useState } from 'react';
 import logo from './logo.svg';
 import axios from "axios";
 import './App.css';
-import { Query } from './Query';
+import { Agg, Sample, VizProps } from './Query';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart } from "recharts";
 import { BarChartProps, MyBarChart } from './BarChart';
+import { AggForm, SampleForm } from './InputForms';
 
 
-interface InputFormProps {
-  onSubmit: (query: Query) => void;
+enum InputFormType {
+  BarChart = "bar_chart",
+  SampleData = "sample_data",
 }
 
-const InputForm: React.FC<InputFormProps> = ({ onSubmit }) => {
-  const [select, setSelect] = useState("");
-  const [where, setWhere] = useState("");
-  const [groupby, setGroupby] = useState("");
+const App: React.FC = () => {
+  const [selectedForm, setSelectedForm] = useState<InputFormType>();
+  const [respAgg, setRespAgg] = useState<any[]>();
+  const [xKey, setXkey] = useState<string>("");
+  const [yKey, setYkey] = useState<string>();
+  const [respSample, setRespSample] = useState<any[]>();
 
-
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-
-    const query: Query = { select, where, groupby }
-
-    onSubmit(query);
+  const handleFormSelection = (formType: InputFormType) => {
+    setSelectedForm(formType);
   };
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        select:
-        <input type="text" value={select} onChange={(e) => setSelect(e.target.value)} />
-      </label>
-      <br />
-      <label>
-        where:
-        <input type="text" value={where} onChange={(e) => setWhere(e.target.value)} />
-      </label>
-      <br />
-      <label>
-        groupby:
-        <input type="text" value={groupby} onChange={(e) => setGroupby(e.target.value)} />
-      </label>
-      <br />
-        <button type="submit">Submit</button>
-    </form>
-  );
-};
-
-const App: React.FC = () => {
-  const [raw, setRaw] = useState<any>(null);
-  const [fmtted, setfmtted] = useState<any>(null);
-  const submitQuery = async (query: Query) => {
-    console.log(query)
+  const submitAgg = async (agg: Agg) => {
     try {
-      const response = await axios.post("http://localhost:8080/run-query", JSON.stringify(query), {
+      const response = await axios.post("http://localhost:8080/run-query", JSON.stringify(agg), {
         headers: {
           "Content-Type": "text/plain",
         },
       });
-      console.log("got data")
-      setRaw(response.data)
+      console.log("got data");
       const keys = Object.keys(response.data[0]);
-      const fmtted = response.data.map ( (dataPoint: any) => ({
-        x: dataPoint[keys[0]],
-        y: dataPoint[keys[1]]
-      })
-      )
-      setfmtted(fmtted)
+      setXkey(keys[0]);
+      setRespAgg(response.data)
     } catch (error) {
       console.error(error);
     }
-  };
+  }
+
+  const submitSample = async (sample: Sample) => {
+    try {
+      const response = await axios.post("http://localhost:8080/run-sample", JSON.stringify(sample), {
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      });
+      console.log("got data");
+      setRespSample(response.data)
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <div>
-      <h1>Query</h1>
-      <InputForm onSubmit={submitQuery} />
-      {raw && (
-        <div>
-          <h2>Response Data:</h2>
-          <pre>{JSON.stringify(raw, null, 2)}</pre>
-        </div>
-      )}
-      {raw &&(
+      <h1>Welcome to Housing Data Explorer</h1>
+      {/* Form for selecting the input type */}
       <div>
-        <h2>Bar Chart</h2>
-        <MyBarChart data={raw} xKey="loan_purpose" />
-      </div>)}
+        <label>
+          Choose an option:
+          <select value={selectedForm} onChange={(e) => handleFormSelection(e.target.value as InputFormType)}>
+            <option value="">Select an option</option>
+            <option value={InputFormType.SampleData}>Sample Data</option>
+            <option value={InputFormType.BarChart}>Plot Bar Chart</option>
+          </select>
+        </label>
+      </div>
 
-      <div>
-          <h2>Line Chart:</h2>
-          <LineChart width={600} height={300} data={fmtted}>
-            <XAxis dataKey="x" />
-            <YAxis />
-            <CartesianGrid strokeDasharray="3 3" />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="y" stroke="#8884d8" />
-          </LineChart>
-        </div>
+      {/* Conditional rendering based on the selectedForm */}
+      {selectedForm === InputFormType.BarChart && <AggForm onSubmit={submitAgg} />}
+      {selectedForm === InputFormType.SampleData && <SampleForm onSubmit={submitSample} />}
+
+      {/* Render different results based on the selectedForm */}
+      {selectedForm === InputFormType.BarChart && respAgg && <MyBarChart data={respAgg} xKey={xKey} />}
+      {selectedForm === InputFormType.SampleData && respSample && <div>
+          <h2>Response Data:</h2>
+          <pre>{JSON.stringify(respSample, null, 2)}</pre>
+        </div>}
     </div>
   );
 };
+
 
 export default App;

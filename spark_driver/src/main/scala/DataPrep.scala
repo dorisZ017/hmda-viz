@@ -1,11 +1,13 @@
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 
+import scala.util.{Success, Try}
+
 object DataPrep {
 
   // https://ffiec.cfpb.gov/documentation/publications/loan-level-datasets/lar-data-fields
 
-  val loanPurpose = udf[String, Int] {
+  private val loanPurpose = udf[String, Int] {
     case 1 => "Home purchase"
     case 2 => "Home improvement"
     case 31 => "Refinancing"
@@ -15,26 +17,46 @@ object DataPrep {
     case _ => "NA"
   }
 
-  val tryToFloat = udf[Option[Float], String] { input =>
-    try Option(input.toFloat) catch {
-      case _ => None
-    }
+  private val loanType = udf[String, Int] {
+    case 1 => "Conventional"
+    case 2 => "Federal Housing Administration insured"
+    case 3 => "Veterans Affairs guaranteed"
+    case 4 => "USDA Rural Housing Service or Farm Service Agency guaranteed"
   }
 
-  val occupancyType = udf[String, Int] {
+  private val actionTaken = udf[String, Int] {
+    case 1 => "Loan originated"
+    case 2 => "Application approved but not accepted"
+    case 3 => "Application denied"
+    case 4 => "Application withdrawn by applicant"
+    case 5 => "File closed for incompleteness"
+    case 6 => "Purchased loan"
+    case 7 => "Preapproval request denied"
+    case 8 => "Preapproval request approved but not accepted"
+  }
+
+
+  private val occupancyType = udf[String, Int] {
     case 1 => "Principal residence"
     case 2 => "Second residence"
     case 3 => "Investment property"
     case _ => "NA"
   }
 
-  val approved = udf[Boolean, Int] {
+  private val tryToFloat = udf[Option[Float], String] { input =>
+    Try(input.toFloat) match {
+      case Success(value) => Some(value)
+      case _ => None
+    }
+  }
+
+  private val approved = udf[Boolean, Int] {
     case 1 => true
     case 2 => true
     case _ => false
   }
 
-  val ageEst = udf[Option[Int], String] {
+  private val ageEst = udf[Option[Int], String] {
     case "<25" => Some(20)
     case "25-34" => Some(30)
     case "35-44" => Some(40)
@@ -45,7 +67,7 @@ object DataPrep {
     case _ => None
   }
 
-  val ratioEst = udf[Option[Int], String] {
+  private val ratioEst = udf[Option[Int], String] {
     case "30%-<36%" => Some(33)
     case "20%-<30%" => Some(25)
     case "50%-60%" => Some(55)
@@ -57,9 +79,16 @@ object DataPrep {
   }
 
 
-  val strToNumCols = Seq("loan_to_value_ratio", "interest_rate", "rate_spread",
+  private val strToNumCols = Seq("loan_to_value_ratio", "interest_rate", "rate_spread",
     "total_loan_costs", "total_points_and_fees", "origination_charges", "discount_points", "lender_credits",
     "loan_term", "intro_rate_period", "property_value", "income")
+
+  private val decoders = Map (
+    "loan_purpose" -> loanPurpose,
+    "loan_type" -> loanType,
+    "action_taken" -> actionTaken,
+    "occupancy_type" -> occupancyType
+  )
 
 
   def main(args: Array[String]): Unit = {
@@ -78,6 +107,13 @@ object DataPrep {
       case (d, name) => d.withColumn(name, tryToFloat(col(s"${name}_str"))).drop(s"${name}_str")
     }
 
-    cleaned.write.format("parquet").mode("overwrite").saveAsTable("t1")
+    val decoded = decoders.foldLeft(cleaned) {
+      case (d, (name, f)) => d
+        .withColumnRenamed(name, s"${name}_encoded")
+        .withColumn(name, f(col(s"${name}_encoded")))
+        .drop(s"${name}_encoded")
+    }
+
+    decoded.write.format("parquet").mode("overwrite").saveAsTable("t1")
   }
 }
