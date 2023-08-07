@@ -26,7 +26,7 @@ const App: React.FC = () => {
 
   const submitAgg = async (agg: Agg) => {
     try {
-      const response = await axios.post("http://localhost:8080/run-query", JSON.stringify(agg), {
+      const response = await axios.post("http://localhost:8082/run-query", JSON.stringify(agg), {
         headers: {
           "Content-Type": "text/plain",
         },
@@ -42,7 +42,7 @@ const App: React.FC = () => {
 
   const submitSample = async (sample: Sample) => {
     try {
-      const response = await axios.post("http://localhost:8080/run-sample", JSON.stringify(sample), {
+      const response = await axios.post("http://localhost:8082/run-sample", JSON.stringify(sample), {
         headers: {
           "Content-Type": "text/plain",
         },

@@ -4,3 +4,7 @@
 /backend/target/
 /.idea/
 /.bsp/
+/metastore_db
+derby.log
+/project/project/target
+/project/target

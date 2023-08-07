@@ -1,6 +1,9 @@
 import com.typesafe.scalalogging.LazyLogging
 
 object Server extends cask.MainRoutes with LazyLogging {
+
+  override def port: Int = 8082
+
   @cask.get("/")
   def hello() = {
     "Hello World!"
