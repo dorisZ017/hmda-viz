@@ -6,8 +6,8 @@ object DataPrepLauncher extends App {
     .setSparkHome(Constants.sparkHome)
     .setAppResource(Constants.driverJarPath)
     .setMainClass("DataPrep")
-    .setMaster("spark://DongyinsMBPHome:7077")
-    .addAppArgs("/Users/doriszhou/Downloads/state_CA-NY.csv")
+    .setMaster("spark://Dongyings-MBP:7077")
+    .addAppArgs("/Users/doriszhou/Downloads/all_state.csv")
     .redirectError()
     .startApplication()
   while (!spark.getState.isFinal) {

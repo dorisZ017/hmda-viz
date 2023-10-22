@@ -9,7 +9,7 @@ export interface BarChartProps {
 export const MyBarChart: React.FC<BarChartProps> = ({data, xKey}) => {
   const dataKeys = Object.keys(data[0]).filter((key) => key !== xKey);
   return (
-    <BarChart width={600} height={400} data={data}>
+    <BarChart width={1200} height={400} data={data}>
       <XAxis dataKey={xKey} />
       <YAxis />
       <CartesianGrid strokeDasharray="3 3" />

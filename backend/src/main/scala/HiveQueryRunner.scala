@@ -18,6 +18,31 @@ object HiveQueryRunner {
       .formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT))
   }
 
+  def runQuery(selects: Seq[Map[String, String]], wheres: Seq[Map[String, String]], groupBys: Seq[String], limit: Option[Long]): String = {
+    val sql = buildSQL(selects, wheres, groupBys, limit)
+    DSL.using(connection).fetch(sql)
+      .formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT))
+  }
+
+  def buildSQL(selects: Seq[Map[String, String]], wheres: Seq[Map[String, String]], groupBys: Seq[String], limit: Option[Long]): String = {
+    val groupsField = if (groupBys.nonEmpty) {
+      s"CONCAT_WS('-', ${groupBys.mkString(", ")}) AS `${groupBys.mkString("-")}`, "
+    } else ""
+    val selectClause = "SELECT " + groupsField + selects.map { s =>
+      val col = s.get("col").getOrElse(throw new IllegalArgumentException("misformatted select"))
+      val funcName = s.get("operator")
+      val funcCol = funcName.map(f => s"$f($col)").getOrElse(col)
+      funcCol + s.get("alias").map(a => s" AS $a").getOrElse("")
+    }.mkString(", ")
+    val whereFields = wheres.map { w =>
+      w.get("col").flatMap(col => w.get("predicate").map(p => s"$col $p")).getOrElse("")
+    }.mkString(" AND ")
+    val whereClause = if (whereFields.nonEmpty) s"WHERE $whereFields" else ""
+    val groupByClause = if (groupBys.nonEmpty) s"GROUP BY ${groupBys.mkString(",")}" else ""
+    val limitClause = limit.map(x => s"LIMIT $x").getOrElse("")
+    s"$selectClause from $prefix $whereClause $groupByClause $limitClause"
+  }
+
   def getSchema: String = {
     DSL.using(connection).fetch(s"select * from $prefix where 1=0")
       .formatJSON()

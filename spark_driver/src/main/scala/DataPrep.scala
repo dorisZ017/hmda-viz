@@ -114,6 +114,10 @@ object DataPrep {
         .drop(s"${name}_encoded")
     }
 
-    decoded.write.format("parquet").mode("overwrite").saveAsTable("t1")
+    decoded
+      .repartition(24)
+      .write.format("parquet")
+      .mode("overwrite")
+      .saveAsTable("t1")
   }
 }

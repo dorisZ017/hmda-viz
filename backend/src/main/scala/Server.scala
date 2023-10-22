@@ -1,4 +1,5 @@
 import com.typesafe.scalalogging.LazyLogging
+import ujson.Value
 
 object Server extends cask.MainRoutes with LazyLogging {
 
@@ -27,6 +28,33 @@ object Server extends cask.MainRoutes with LazyLogging {
     val groupBy = js.obj.get("groupby").map(_.str)
     val res = HiveQueryRunner.runQuery(select, where, groupBy, None)
     cask.Response(res, headers = Seq(("Access-Control-Allow-Origin", "*")))
+  }
+
+  @cask.post("/run-query-v2")
+  def runQuery(request: cask.Request): cask.Response[String] = {
+    logger.info(request.text())
+    val js = ujson.read(request.text())
+    /*
+    {
+     "select":[{"col":"abc","operator":"max","alias":"a"}],
+     "where":[{"col":"a","predicate":">0"}],
+     "groupBy":["b"]
+    }
+     */
+    val selects = getMapSeq(js, "select")
+    val wheres = getMapSeq(js, "where")
+    val groupBys = js.obj.get("groupBy").map { v =>
+      v.arr.map(_.str)
+    }.getOrElse(Seq())
+    val res = HiveQueryRunner.runQuery(selects, wheres, groupBys, None)
+    cask.Response(res, headers = Seq(("Access-Control-Allow-Origin", "*")))
+  }
+
+  private def getMapSeq(js: Value, key: String): Seq[Map[String, String]] = {
+    js.obj.get(key).map(_.arr) match {
+      case None => throw new IllegalArgumentException(s"${key} not found in ${js.toString()}")
+      case Some(ss) => ss.map { s => s.obj.collect { case (k, v) => (k, v.str) }.toMap }
+    }
   }
 
   @cask.post("/run-sample")
