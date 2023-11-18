@@ -47,5 +47,5 @@ export interface Filter {
 export interface AggV2 {
     select: Array<Select>,
     where: Array<Filter>,
-    groupBy: Array<string>
+    groupBy: Array<string>,
 }

@@ -8,12 +8,14 @@ import { BarChartProps, MyBarChart } from './BarChart';
 import { AggForm, SampleForm, submitAgg } from './InputForms';
 import { AggFormV2 } from './AggForm';
 import { MyPieChart } from './PieChart';
+import { StateMap } from './MapChart'
 
 
 enum InputFormType {
   BarChart = "bar_chart",
   PieChart = "pie_chart",
   SampleData = "sample_data",
+  MapChart = "map_chart",
 }
 
 const App: React.FC = () => {
@@ -87,6 +89,7 @@ const App: React.FC = () => {
             <option value={InputFormType.SampleData}>Sample Data</option>
             <option value={InputFormType.BarChart}>Plot Bar Chart</option>
             <option value={InputFormType.PieChart}>Plot Pie Chart</option>
+            <option value={InputFormType.MapChart}>Plot Map Chart</option>
           </select>
         </label>
       </div>
@@ -94,11 +97,13 @@ const App: React.FC = () => {
       {/* Conditional rendering based on the selectedForm */}
       {selectedForm === InputFormType.BarChart && <AggFormV2 onSubmit={submitAggV2} />}
       {selectedForm === InputFormType.PieChart && <AggFormV2 onSubmit={submitAggV2} />}
+      {selectedForm === InputFormType.MapChart && <AggFormV2 onSubmit={submitAggV2} />}
       {selectedForm === InputFormType.SampleData && <SampleForm onSubmit={submitSample} />}
 
       {/* Render different results based on the selectedForm */}
       {selectedForm === InputFormType.BarChart && respAgg && <MyBarChart data={respAgg} xKey={xKey} />}
       {selectedForm === InputFormType.PieChart && respAgg && <MyPieChart data={respAgg} dataKey={yKey} nameKey={xKey} />}
+      {selectedForm === InputFormType.MapChart && respAgg && <StateMap data={respAgg} yKey={yKey} />}
       {selectedForm === InputFormType.SampleData && respSample && <div>
           <h2>Response Data:</h2>
           <pre>{JSON.stringify(respSample, null, 2)}</pre>
