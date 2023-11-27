@@ -49,3 +49,9 @@ export interface AggV2 {
     where: Array<Filter>,
     groupBy: Array<string>,
 }
+
+export interface SampleV2 {
+    select: Array<Select>,
+    where: Array<Filter>,
+    limit: number
+}

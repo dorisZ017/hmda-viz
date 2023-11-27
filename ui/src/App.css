@@ -36,3 +36,109 @@
     transform: rotate(360deg);
   }
 }
+
+/* Apply a modern font family */
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Page background color */
+body {
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container for the entire app */
+#app-container {
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Header styling */
+h1 {
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Dropdown style */
+select {
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #fff;
+  color: #333;
+}
+
+/* Input field style */
+input {
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #fff;
+  color: #333;
+}
+
+/* Button style */
+button {
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #4caf50;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Error message style */
+.error-message {
+  color: red;
+  margin-top: 10px;
+}
+
+/* List styling */
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+/* List item style */
+li {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-container {
+  display: flex;
+  width: 90%; /* Set the desired width */
+  max-width: 1200px; /* Optional: Set a maximum width for responsiveness */
+  margin: 0 auto; /* Center the form horizontally */
+}
+
+
+.form-section {
+  flex: 1;
+}
+
+.clauses-section {
+  flex: 1;
+}
+
+.clauses-section ul {
+  padding-left: 20px; /* Add some padding to the left of the list */
+}

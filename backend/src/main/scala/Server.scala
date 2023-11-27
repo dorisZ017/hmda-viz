@@ -46,7 +46,8 @@ object Server extends cask.MainRoutes with LazyLogging {
     val groupBys = js.obj.get("groupBy").map { v =>
       v.arr.map(_.str)
     }.getOrElse(Seq())
-    val res = HiveQueryRunner.runQuery(selects, wheres, groupBys, None)
+    val limit = js.obj.get("limit").map(_.toString().toLong)
+    val res = HiveQueryRunner.runQuery(selects, wheres, groupBys, limit)
     cask.Response(res, headers = Seq(("Access-Control-Allow-Origin", "*")))
   }
 

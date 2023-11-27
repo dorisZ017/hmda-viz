@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import logo from './logo.svg';
 import axios from "axios";
 import './App.css';
-import { Agg, AggV2, Sample, VizProps } from './Query';
+import { Agg, AggV2, Sample, SampleV2, VizProps } from './Query';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart } from "recharts";
 import { BarChartProps, MyBarChart } from './BarChart';
-import { AggForm, SampleForm, submitAgg } from './InputForms';
 import { AggFormV2 } from './AggForm';
 import { MyPieChart } from './PieChart';
 import { StateMap } from './MapChart'
+import { MyScatterChart } from './ScatterPlot';
+import { SampleFormV2 } from './SampleForm';
 
 
 enum InputFormType {
@@ -16,6 +17,7 @@ enum InputFormType {
   PieChart = "pie_chart",
   SampleData = "sample_data",
   MapChart = "map_chart",
+  ScatterPlot = "scatter_plot"
 }
 
 const App: React.FC = () => {
@@ -59,6 +61,24 @@ const App: React.FC = () => {
     }
   }
 
+
+  const submitSampleV2 = async (sample: SampleV2) => {
+    try {
+      const response = await axios.post("http://localhost:8082/run-query-v2", JSON.stringify(sample), {
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      });
+      console.log("got data sample v2");
+      const keys = Object.keys(response.data[0]);
+      setXkey(keys[0]);
+      setYkey(keys[1]);
+      setRespAgg(response.data)
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const submitAggV2 = async (agg: AggV2) => {
     console.log(JSON.stringify(agg));
     try {
@@ -90,6 +110,7 @@ const App: React.FC = () => {
             <option value={InputFormType.BarChart}>Plot Bar Chart</option>
             <option value={InputFormType.PieChart}>Plot Pie Chart</option>
             <option value={InputFormType.MapChart}>Plot Map Chart</option>
+            <option value={InputFormType.ScatterPlot}>Scatter Plot</option>
           </select>
         </label>
       </div>
@@ -98,12 +119,14 @@ const App: React.FC = () => {
       {selectedForm === InputFormType.BarChart && <AggFormV2 onSubmit={submitAggV2} />}
       {selectedForm === InputFormType.PieChart && <AggFormV2 onSubmit={submitAggV2} />}
       {selectedForm === InputFormType.MapChart && <AggFormV2 onSubmit={submitAggV2} />}
-      {selectedForm === InputFormType.SampleData && <SampleForm onSubmit={submitSample} />}
+      {selectedForm === InputFormType.ScatterPlot && <SampleFormV2 onSubmit={submitSampleV2} />}
+      {selectedForm === InputFormType.SampleData && <SampleFormV2 onSubmit={submitSampleV2} />}
 
       {/* Render different results based on the selectedForm */}
       {selectedForm === InputFormType.BarChart && respAgg && <MyBarChart data={respAgg} xKey={xKey} />}
       {selectedForm === InputFormType.PieChart && respAgg && <MyPieChart data={respAgg} dataKey={yKey} nameKey={xKey} />}
       {selectedForm === InputFormType.MapChart && respAgg && <StateMap data={respAgg} yKey={yKey} />}
+      {selectedForm === InputFormType.ScatterPlot && respAgg && <MyScatterChart data={respAgg} xKey={xKey} yKey={yKey} />}
       {selectedForm === InputFormType.SampleData && respSample && <div>
           <h2>Response Data:</h2>
           <pre>{JSON.stringify(respSample, null, 2)}</pre>
